@@ -283,35 +283,6 @@ body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',ser
 }
 
 /* ── GALERÍA RUEDA 3D ── */
-#galeria{padding:72px 28px 80px;text-align:center;overflow:visible;background:var(--surface)}
-.wheel-scene{
-  position:relative;width:calc(100% + 48px);margin-left:-24px;
-  margin-top:36px;overflow:hidden;
-}
-.wheel-ring{
-  display:flex;gap:14px;
-  overflow-x:auto;overflow-y:hidden;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
-  padding:16px 24px 20px;
-  scrollbar-width:none;
-}
-.wheel-ring::-webkit-scrollbar{display:none}
-.wheel-card{
-  flex:0 0 200px;height:280px;
-  border-radius:12px;overflow:hidden;
-  border:1.5px solid rgba(200,165,146,.22);
-  box-shadow:0 8px 28px rgba(60,74,54,.18);
-  scroll-snap-align:center;
-  transition:transform .3s ease,box-shadow .3s ease;
-}
-.wheel-card:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(60,74,54,.28)}
-.wheel-card img{
-  width:100%;height:100%;
-  object-fit:cover;object-position:center;
-  display:block;pointer-events:none;
-}
-/* ── GALERÍA RUEDA 3D ── */
 #galeria{padding:72px 28px 80px;background:var(--bg);text-align:center;overflow:visible}
 .wheel-scene{
   position:relative;
@@ -498,7 +469,7 @@ body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',ser
 
   <!-- INVITACIÓN -->
   <section class="sec rv" style="text-align:center;overflow:hidden">
-    <div class="sec-bg" style="background-image:url('botanica2.png');opacity:.22"></div>
+    <div class="sec-bg" style="background-image:url('fondo-gracia.jpg');opacity:.22"></div>
     <span class="eyebrow stagger-child">Con la gracia de Dios</span>
     <div class="orn stagger-child"><div class="orn-line"></div><div class="orn-diamond-sm"></div><div class="orn-diamond"></div><div class="orn-diamond-sm"></div><div class="orn-line"></div></div>
     <h1 class="heading stagger-child">Tania y Gustavo</h1>
@@ -960,7 +931,7 @@ function initMain(){
     var ring=document.getElementById('wheel-ring');
     if(!ring||cards.length===0)return;
     var n=cards.length;
-    var radius=320;
+    var radius=210;
     var rot=0;
     var vel=0;
     var isDrag=false;
