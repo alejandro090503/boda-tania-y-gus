@@ -311,6 +311,42 @@ body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',ser
   object-fit:cover;object-position:center;
   display:block;pointer-events:none;
 }
+/* ── GALERÍA RUEDA 3D ── */
+#galeria{padding:72px 28px 80px;background:var(--bg);text-align:center;overflow:visible}
+.wheel-scene{
+  position:relative;
+  width:100%;
+  height:520px;
+  margin:40px auto 0;
+  perspective:1400px;
+  transform-style:preserve-3d;
+  overflow:visible;
+}
+.wheel-ring{
+  position:absolute;
+  width:100%;height:100%;
+  transform-style:preserve-3d;
+  cursor:grab;
+}
+.wheel-ring.dragging{cursor:grabbing}
+.wheel-card{
+  position:absolute;
+  width:200px;height:280px;
+  left:50%;top:50%;
+  margin-left:-100px;margin-top:-140px;
+  border-radius:18px;
+  overflow:hidden;
+  border:2px solid rgba(200,165,146,.25);
+  box-shadow:0 12px 40px rgba(90,95,73,.20);
+  user-select:none;
+  -webkit-user-select:none;
+}
+.wheel-card img{
+  width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  display:block;
+  pointer-events:none;
+}
 .gal-hint{
   font-family:'Cormorant Garamond',serif;font-style:italic;
   font-size:13px;letter-spacing:3px;color:var(--dark);
@@ -601,6 +637,27 @@ body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',ser
         <span class="dc-avoid-name">Marfil</span>
       </div>
     </div>
+  </section>
+
+  <!-- GALERÍA RUEDA 3D -->
+  <section id="galeria">
+    <span class="eyebrow rv">Nosotros</span>
+    <h2 class="heading-sm rv">Nuestra Historia</h2>
+    <div class="wheel-scene rv" id="wheel-scene">
+      <div class="wheel-ring" id="wheel-ring">
+        <div class="wheel-card"><img src="foto1.jpg" alt="Tania &amp; Gustavo" loading="lazy"></div>
+        <div class="wheel-card"><img src="foto2.jpg" alt="Tania &amp; Gustavo" loading="lazy"></div>
+        <div class="wheel-card"><img src="foto3.jpg" alt="Tania &amp; Gustavo" loading="lazy"></div>
+        <div class="wheel-card"><img src="foto4.jpg" alt="Tania &amp; Gustavo" loading="lazy"></div>
+        <div class="wheel-card"><img src="foto5.jpg" alt="Tania &amp; Gustavo" loading="lazy"></div>
+        <div class="wheel-card"><img src="foto6.jpg" alt="Tania &amp; Gustavo" loading="lazy"></div>
+        <div class="wheel-card"><img src="foto7.jpg" alt="Tania &amp; Gustavo" loading="lazy"></div>
+        <div class="wheel-card"><img src="foto8.jpg" alt="Tania &amp; Gustavo" loading="lazy"></div>
+        <div class="wheel-card"><img src="foto9.jpg" alt="Tania &amp; Gustavo" loading="lazy"></div>
+        <div class="wheel-card"><img src="foto10.jpg" alt="Tania &amp; Gustavo" loading="lazy"></div>
+      </div>
+    </div>
+    <p class="gal-hint rv">Arrastra para girar</p>
   </section>
 
   <!-- CONFIRMACIÓN RSVP -->
@@ -896,6 +953,59 @@ function initMain(){
         scrollTrigger:{trigger:sec,start:'top 82%',toggleActions:'play none none none'}});
     });
   });
+
+  /* Galería — rueda 3D con inercia */
+  (function initWheel(){
+    var cards=document.querySelectorAll('.wheel-card');
+    var ring=document.getElementById('wheel-ring');
+    if(!ring||cards.length===0)return;
+    var n=cards.length;
+    var radius=320;
+    var rot=0;
+    var vel=0;
+    var isDrag=false;
+    var startX=0;
+    var startRot=0;
+    var lastX=0;
+    var rafId=null;
+    cards.forEach(function(card,i){
+      card.style.transform='rotateY('+(360/n*i)+'deg) translateZ('+radius+'px)';
+    });
+    function setRot(r){rot=r;gsap.set(ring,{rotateY:rot});}
+    function inertia(){
+      if(Math.abs(vel)<0.05){vel=0;return;}
+      vel*=0.94;setRot(rot+vel);
+      rafId=requestAnimationFrame(inertia);
+    }
+    ring.addEventListener('mousedown',function(e){
+      cancelAnimationFrame(rafId);isDrag=true;vel=0;
+      startX=e.clientX;startRot=rot;lastX=e.clientX;
+      ring.classList.add('dragging');
+    });
+    window.addEventListener('mousemove',function(e){
+      if(!isDrag)return;var dx=e.clientX-startX;
+      vel=(e.clientX-lastX)*0.5;lastX=e.clientX;
+      setRot(startRot+dx*0.45);
+    });
+    window.addEventListener('mouseup',function(){
+      if(!isDrag)return;isDrag=false;
+      ring.classList.remove('dragging');
+      rafId=requestAnimationFrame(inertia);
+    });
+    ring.addEventListener('touchstart',function(e){
+      cancelAnimationFrame(rafId);isDrag=true;vel=0;
+      startX=e.touches[0].clientX;startRot=rot;lastX=startX;
+    },{passive:true});
+    window.addEventListener('touchmove',function(e){
+      if(!isDrag)return;var dx=e.touches[0].clientX-startX;
+      vel=(e.touches[0].clientX-lastX)*0.5;lastX=e.touches[0].clientX;
+      setRot(startRot+dx*0.45);
+    },{passive:true});
+    window.addEventListener('touchend',function(){
+      if(!isDrag)return;isDrag=false;
+      rafId=requestAnimationFrame(inertia);
+    });
+  })();
 
   /* Copy */
   window.copyText=function(text){
