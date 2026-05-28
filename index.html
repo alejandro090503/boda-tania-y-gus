@@ -920,28 +920,14 @@ function initEnvelope(){
   const musicEl=document.getElementById('bgAudio');
   const musicBtn=document.getElementById('musicFab');
   if(!musicEl)return;
-  const START_SEC=25;
   musicEl.volume=.55;
-  var firstPlay=true;
-  function seekToStart(){try{musicEl.currentTime=START_SEC;}catch(e){}}
-  /* Forzar seek cuando los metadatos están listos */
-  musicEl.addEventListener('loadedmetadata',seekToStart,{once:true});
-  /* Garantizar que la primera vez que suene arranque en :25 */
-  musicEl.addEventListener('playing',function(){
-    if(firstPlay){firstPlay=false;if(musicEl.currentTime<START_SEC-1){musicEl.currentTime=START_SEC;}}
-  },{once:true});
   musicEl.addEventListener('play',()=>musicBtn&&musicBtn.classList.add('is-playing'));
   musicEl.addEventListener('pause',()=>musicBtn&&musicBtn.classList.remove('is-playing'));
-  musicEl.addEventListener('ended',()=>{musicEl.currentTime=START_SEC;musicEl.play().catch(()=>{});});
+  musicEl.addEventListener('ended',()=>{musicEl.currentTime=0;musicEl.play().catch(()=>{});});
   function showBtn(){if(musicBtn)musicBtn.classList.add('is-ready');}
-  function startMusic(){
-    showBtn();
-    if(musicEl.readyState>=1){musicEl.currentTime=START_SEC;}
-    else{musicEl.addEventListener('loadedmetadata',function(){musicEl.currentTime=START_SEC;},{once:true});}
-    const p=musicEl.play();if(p&&typeof p.catch==='function')p.catch(()=>{});
-  }
+  function startMusic(){showBtn();const p=musicEl.play();if(p&&typeof p.catch==='function')p.catch(()=>{});}
   function tryAutoMusic(){
-    showBtn();seekToStart();
+    showBtn();
     const p=musicEl.play();
     if(p&&typeof p.catch==='function'){
       p.catch(function(){
@@ -952,10 +938,7 @@ function initEnvelope(){
     }
   }
   window._startAudio=startMusic;
-  if(musicBtn){musicBtn.addEventListener('click',()=>{
-    if(musicEl.paused){if(musicEl.currentTime<1){musicEl.currentTime=START_SEC;}musicEl.play().catch(()=>{});}
-    else{musicEl.pause();}
-  });}
+  if(musicBtn){musicBtn.addEventListener('click',()=>{if(musicEl.paused){musicEl.play().catch(()=>{});}else{musicEl.pause();}});}
   setTimeout(tryAutoMusic,400);
 })();
 
