@@ -148,7 +148,8 @@ body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',ser
 .dc-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
 .dc-col{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:22px 14px;text-align:center}
 .dc-col-ttl{font-family:'Italiana',serif;font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:var(--dark);margin-top:14px}
-.dc-avoid-lbl{font-family:'Italiana',serif;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--dark);text-align:center;display:block;margin:20px 0 12px;opacity:.8}
+.dc-avoid-lbl{font-family:'Italiana',serif;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dark);text-align:center;display:block;margin:20px auto 8px;max-width:300px;line-height:1.9;opacity:.9}
+.dc-avoid-note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;font-weight:600;color:var(--text);opacity:.75;text-align:center;max-width:300px;margin:0 auto 14px;line-height:1.6}
 .dc-avoid-row{display:flex;justify-content:center;gap:20px;margin-bottom:4px}
 .dc-avoid-sw{display:flex;flex-direction:column;align-items:center;gap:6px}
 .dc-avoid-circle{width:32px;height:32px;border-radius:50%}
@@ -654,9 +655,9 @@ body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',ser
   <!-- DRESS CODE -->
   <section class="sec rv" style="text-align:center;background:var(--surface)">
     <span class="eyebrow">Código de Vestimenta</span>
-    <h2 class="heading-sm">Formal Elegante</h2>
+    <h2 class="heading-sm">Formal Elegante &middot; Colorido</h2>
     <div class="orn" style="margin-top:16px"><div class="orn-line"></div><div class="orn-diamond-sm"></div><div class="orn-diamond"></div><div class="orn-diamond-sm"></div><div class="orn-line"></div></div>
-    <p class="dc-text" style="margin-top:22px">Nos encantaría verte con tu mejor look formal y elegante.</p>
+    <p class="dc-text" style="margin-top:22px">Nos encantaría verte con tu mejor look formal y elegante, <em>en color</em>. Anímate a lucir tonos vivos y alegres: ¡queremos una fiesta llena de color!</p>
     <div class="dc-cols rv">
       <div class="dc-col">
         <svg viewBox="0 0 64 80" width="64" height="80" fill="none">
@@ -679,7 +680,8 @@ body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',ser
         <div class="dc-col-ttl">Damas</div>
       </div>
     </div>
-    <span class="dc-avoid-lbl">Por favor evita</span>
+    <span class="dc-avoid-lbl">Favor de evitar los colores blanco y marfil</span>
+    <p class="dc-avoid-note">Estos tonos están reservados para la novia.</p>
     <div class="dc-avoid-row rv">
       <div class="dc-avoid-sw">
         <div class="dc-avoid-circle" style="background:#FFFFFF;border:1px solid rgba(0,0,0,.12)"></div>
@@ -1040,6 +1042,7 @@ function launchPetals(ambient){
   var urlPases  = (isNaN(rawP) || rawP < 1 || rawP > 20) ? 1 : rawP;
 
   var rsvpChoice     = null;
+  var savedNames     = [];
   var noteEl         = document.getElementById('rsvp-pases-note');
   var pasesDisplayEl = document.getElementById('rsvp-pases-display');
   var pasesNumEl     = document.getElementById('rsvp-pases-num');
@@ -1069,6 +1072,8 @@ function launchPetals(ambient){
       inp.className = 'rsvp-field-input';
       inp.placeholder = 'Invitado ' + (i + 1);
       inp.autocomplete = 'off';
+      inp.value = savedNames[i] || '';
+      (function(idx){ inp.addEventListener('input', function(){ savedNames[idx] = this.value; }); })(i);
       row.appendChild(lbl);
       row.appendChild(inp);
       fieldsEl.appendChild(row);
@@ -1094,15 +1099,15 @@ function launchPetals(ambient){
   btnNo.addEventListener('click',  function(){ selectRsvp('no');  });
 
   if (urlPara) {
-    fetch(PANEL_API + '?para=' + encodeURIComponent(urlPara) + '&url_boda=' + encodeURIComponent(RSVP_URL))
+    fetch(PANEL_API + '?nombre=' + encodeURIComponent(urlPara) + '&url_boda=' + encodeURIComponent(RSVP_URL))
       .then(function(r){ return r.json(); })
-      .then(function(d){
-        if (d.estado === 'confirmado' || d.estado === 'declino') {
-          selectRsvp(d.estado === 'confirmado' ? 'yes' : 'no');
-          if (d.estado === 'confirmado' && d.nombres_confirmados && d.nombres_confirmados.length) {
-            var inputs = fieldsEl.querySelectorAll('.rsvp-field-input');
-            d.nombres_confirmados.forEach(function(n, i){ if (inputs[i]) inputs[i].value = n; });
+      .then(function(resp){
+        var d = resp.invitado;
+        if (d && (d.estado === 'confirmado' || d.estado === 'declino')) {
+          if (d.nombres_confirmados && d.nombres_confirmados.length) {
+            savedNames = d.nombres_confirmados.slice();
           }
+          selectRsvp(d.estado === 'confirmado' ? 'yes' : 'no');
           btnText.textContent = 'Actualizar respuesta';
           feedbackEl.textContent = d.estado === 'confirmado'
             ? '¡Ya tienes confirmada tu asistencia! Puedes actualizar tu respuesta.'
